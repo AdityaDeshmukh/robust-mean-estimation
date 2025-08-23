@@ -54,7 +54,7 @@ If you found this package useful, please consider citing these references.
 ```
 @phdthesis{deshmukh2024topics,
   title={Topics on statistical inference with model uncertainty},
-  author={Deshmukh, Aditya Omprakash},
+  author={Deshmukh, Aditya},
   year={2024},
   school={University of Illinois at Urbana-Champaign}
 }
