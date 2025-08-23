@@ -4,7 +4,7 @@ This repository provides fast, efficient and accurate methods (which do not requ
 These methods are based on rigorous theoretical foundations (see references).
 
 Two methods are provided in `robust_mean_estimation.py`:
-1) `robust_mean` : outlier-fraction agnostic, but requires seqctral bound ($\Sigma\preceq\sigma^2 I$).
+1) `robust_mean` : outlier-fraction agnostic, but requires spectral bound ($\Sigma\preceq\sigma^2 I$).
 2) `meta_robust_mean` : outlier-fraction and spectral bound agnostic (only requires lower bound on $\sigma$).
    
 Algorithms implemented from the following references:
