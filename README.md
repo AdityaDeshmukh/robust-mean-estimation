@@ -10,3 +10,7 @@ Implementation of algorithms from the following references:
 3) [Robust estimation algorithms don’t need to know the corruption level](https://arxiv.org/pdf/2202.05453).
 
 This repository contains a NumPy + SciPy implementation of robust mean estimation algorithms.
+
+## Dependencies
+- numpy
+- scipy
