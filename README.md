@@ -32,14 +32,19 @@ X = np.vstack([X, outliers])
 # Standard (naive) mean — sensitive to outliers
 naive_mean = X.mean(axis=0)
 
+# Coordinate-wise median — more robust but not optimal in high-dimensions
+median = np.median(X, axis=0)
+
 # Robust mean estimate
 robust_mu = robust_mean(X, sigma)
 
-print("Distance of naive mean from true mean:", np.linalg.norm(naive_mean - mu))
-print("Distance of robust mean from true mean:", np.linalg.norm(robust_mu - mu))
+print("Distance of naive mean from true mean:", round(np.linalg.norm(naive_mean - mu),5))
+print("Distance of median from true mean:", round(np.linalg.norm(median - mu),5))
+print("Distance of robust mean from true mean:", round(np.linalg.norm(robust_mu - mu),5))
 ```
 ### Example output
 ```
-Distance of naive mean from true mean: 5.267210378864232
-Distance of robust mean from true mean: 0.17065781537680327
+Distance of naive mean from true mean: 5.26721
+Distance of median from true mean: 0.8246
+Distance of robust mean from true mean: 0.17066
 ```
