@@ -23,7 +23,7 @@ from robust_mean_estimation import robust_mean
 
 # Generate toy data: Gaussian cloud + outliers
 mu, sigma = 0, 1
-n ,d = 500, 10
+n, d = 500, 10
 rng = np.random.default_rng(0)
 X = rng.normal(mu, sigma, size=(n, d))             # inliers
 outliers = rng.normal(10, 1, size=(int(0.2*n), d)) # outliers
