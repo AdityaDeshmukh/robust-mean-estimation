@@ -38,7 +38,6 @@ def robust_mean(X: np.ndarray, sigma: float, c: float = 1, max_iter: int = 100) 
         2. "Robust Mean Estimation in High Dimensions: An Outlier-Fraction Agnostic and EfficientAlgorithm"
             https://arxiv.org/pdf/1706.05047.pdf
         
-
     Method:    
         This approach filters outliers by projecting onto directions of largest variance
         and trimming based on a variance threshold.
@@ -49,7 +48,7 @@ def robust_mean(X: np.ndarray, sigma: float, c: float = 1, max_iter: int = 100) 
         Data matrix of shape (n, d) where n = number of samples, d = dimension, or
         a 1D array of shape (n,) for univariate data.
     sigma : float
-        Standard deviation parameter that controls the trimming threshold.
+        Spectral bound parameter that controls the trimming threshold.
     c : float
         Constant multiplier for the variance threshold (default: 1).
     max_iter : int, optional
@@ -190,5 +189,6 @@ def meta_robust_mean(X: np.ndarray, sigma_min: float = 1, theta: float = 1.1, c:
 
     if sigma_hat is None:
         raise RuntimeError("No valid beta_hat found — check robust_mean outputs.")
+
 
     return estimates[sigma_hat]
