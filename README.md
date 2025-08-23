@@ -58,12 +58,6 @@ If you found this package useful, please consider citing these references.
   year={2024},
   school={University of Illinois at Urbana-Champaign}
 }
-@phdthesis{deshmukh2024,
-    title    = {An examination of keystroke dynamics for continuous user authentication},
-    school   = {Queensland University of Technology},
-    author   = {Alsolami, Eesa},
-    year     = {2012}, %other attributes omitted
-}
 @article{deshmukh2023robust,
   title={Robust mean estimation in high dimensions: An outlier-fraction agnostic and efficient algorithm},
   author={Deshmukh, Aditya and Liu, Jing and Veeravalli, Venugopal V},
