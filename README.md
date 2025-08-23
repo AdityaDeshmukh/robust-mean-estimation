@@ -48,3 +48,36 @@ Distance of naive mean from true mean: 5.26721
 Distance of median from true mean: 0.8246
 Distance of robust mean from true mean: 0.17066
 ```
+
+## Citation
+If you found this package useful, please consider citing these references.
+```
+@phdthesis{deshmukh2024topics,
+  title={Topics on statistical inference with model uncertainty},
+  author={Deshmukh, Aditya Omprakash},
+  year={2024},
+  school={University of Illinois at Urbana-Champaign}
+}
+@phdthesis{deshmukh2024,
+    title    = {An examination of keystroke dynamics for continuous user authentication},
+    school   = {Queensland University of Technology},
+    author   = {Alsolami, Eesa},
+    year     = {2012}, %other attributes omitted
+}
+@article{deshmukh2023robust,
+  title={Robust mean estimation in high dimensions: An outlier-fraction agnostic and efficient algorithm},
+  author={Deshmukh, Aditya and Liu, Jing and Veeravalli, Venugopal V},
+  journal={IEEE Transactions on Information Theory},
+  volume={69},
+  number={7},
+  pages={4675--4690},
+  year={2023},
+  publisher={IEEE}
+}
+@article{jain2022robust,
+  title={Robust estimation algorithms don't need to know the corruption level},
+  author={Jain, Ayush and Orlitsky, Alon and Ravindrakumar, Vaishakh},
+  journal={arXiv preprint arXiv:2202.05453},
+  year={2022}
+}
+```
