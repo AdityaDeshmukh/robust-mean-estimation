@@ -33,10 +33,10 @@ def robust_mean(X: np.ndarray, sigma: float, c: float = 1, max_iter: int = 100) 
 
     References:
         1. "Topics in statistical inference with model uncertainty"
-            https://www.ideals.illinois.edu/items/131409/bitstreams/436773/data.pdf (Algorithm 2)
+        https://www.ideals.illinois.edu/items/131409/bitstreams/436773/data.pdf (Algorithm 2).
             
         2. "Robust Mean Estimation in High Dimensions: An Outlier-Fraction Agnostic and EfficientAlgorithm"
-            https://arxiv.org/pdf/1706.05047.pdf
+        https://arxiv.org/pdf/1706.05047.pdf.
         
     Method:    
         This approach filters outliers by projecting onto directions of largest variance
