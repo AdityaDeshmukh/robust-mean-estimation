@@ -1,8 +1,8 @@
 # Robust Mean Estimation
 Robust mean estimation is a statistical technique designed to compute a reliable mean in the presence of outliers and heavy-tailed inliers.
-Two functions are provided:
-1) `robust_mean` : this algorithm does not require the knowledge of fraction of outliers.
-2) `meta_robust_mean` :  this algorithm does not require the knowledge of fraction of outliers, or the knowledge of spectral bound.
+Two methods are provided in `robust_mean_estimation.py`:
+1) `robust_mean` : does not require the knowledge of fraction of outliers.
+2) `meta_robust_mean` :  does not require the knowledge of fraction of outliers, or the knowledge of spectral bound.
    
 Implementation of algorithms from the following references:
 1) Deshmukh, A. (2024). [Topics in statistical inference with model uncertainty](https://www.ideals.illinois.edu/items/131409/bitstreams/436773/data.pdf) (Doctoral dissertation, University of Illinois at Urbana-Champaign).
