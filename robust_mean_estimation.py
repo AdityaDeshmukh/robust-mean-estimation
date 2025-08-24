@@ -7,7 +7,7 @@ from scipy.sparse.linalg import LinearOperator, eigsh
 # Robust Mean Estimation
 # -------------------------------------------------------------------------
 
-def _linear_operator_mv(v: np.ndarray, weights: np.ndarray, data: np.ndarray) -> np.ndarray:
+def _linear_operator_mv(v: np.ndarray, weights: np.ndarray, X: np.ndarray, center: np.ndarray) -> np.ndarray:
     """
     Matrix-vector multiplication function for use in a LinearOperator.
 
@@ -17,17 +17,20 @@ def _linear_operator_mv(v: np.ndarray, weights: np.ndarray, data: np.ndarray) ->
         Vector to multiply (dimension d).
     weights : np.ndarray
         Weights assigned to each sample (length n).
-    data : np.ndarray
-        Centered data matrix of shape (n, d).
+    X : np.ndarray
+        Data matrix of shape (n, d).
+    center : np.ndarray
+        Center vector (dimension d).
 
     Returns
     -------
     np.ndarray
         Result of applying the weighted covariance operator to v.
     """
-    return (weights * (data @ v)) @ data
+    centered_proj = weights * (X @ v - center @ v)
+    return centered_proj @ X - center * np.sum(centered_proj)
 
-def robust_mean(X: np.ndarray, sigma: float, c: float = 1, max_iter: int = 100) -> np.ndarray:
+def robust_mean(X: np.ndarray, sigma: float, c: float = 2.0, max_iter: int = 100) -> np.ndarray:
     """
     Estimate the robust mean of a dataset using an iterative filtering procedure.
 
@@ -50,8 +53,8 @@ def robust_mean(X: np.ndarray, sigma: float, c: float = 1, max_iter: int = 100) 
     sigma : float
         Spectral bound parameter that controls the trimming threshold.
     c : float
-        Constant multiplier for the variance threshold (default: 1).
-    max_iter : int, optional
+        Constant multiplier for the variance threshold (default: 2).
+    max_iter : int, optiona
         Maximum number of iterations (default: 100).
 
     Returns
@@ -65,12 +68,27 @@ def robust_mean(X: np.ndarray, sigma: float, c: float = 1, max_iter: int = 100) 
 
     n, d = X.shape
 
-    # Initialize random direction
-    v = np.random.normal(0, 1, size=d)
-    prev_weights = np.ones(n)/n
+    # Initializations
+    v = np.random.normal(0,1,d)
+    v /= np.linalg.norm(v)
+    weights = np.ones(n)/n
     threshold = c * sigma**2
 
     for _ in range(max_iter):
+        prev_weights = weights.copy()
+
+        # Weighted mean
+        mu = np.average(X, axis=0, weights=weights)
+
+        # Find direction of maximum variance
+        if d > 1:
+            # Compute top eigenvector of covariance operator
+            lin_op = LinearOperator((d, d),matvec=partial(_linear_operator_mv, weights=weights, X=X, center = mu))
+            _, eigvecs = eigsh(lin_op, k=1, which="LA", v0=v, ncv=15, tol=1e-3)
+            v = eigvecs[:, 0]
+        else:
+            v = np.array([1.0])
+
         # Normalize direction
         v /= np.linalg.norm(v)
 
@@ -85,38 +103,17 @@ def robust_mean(X: np.ndarray, sigma: float, c: float = 1, max_iter: int = 100) 
 
         # Choose cutoff index based on variance constraint
         cutoff = bisect_left(np.cumsum(sorted_dev), n*threshold)
-
+        
         # Binary weights: keep samples up to cutoff
-        weights = np.zeros(n)
-        weights[sorted_indices[:cutoff]] = 1/n
-
-        # Ensure weights don’t increase
-        weights = np.minimum(weights, prev_weights)
+        weights[sorted_indices[cutoff:]] = 0
 
         # Weighted mean estimate
         if np.sum(weights) == 0:
             raise RuntimeError("All weights are zero; consider increasing sigma or c, or sigma_min if using meta_robust_mean.")
-        mu = np.average(X, axis=0, weights=weights)
 
-        # Centered data
-        centered_X = X - mu
-
-        # Find direction of maximum variance
-        if d > 1:
-            lin_op = LinearOperator((d, d),matvec=partial(_linear_operator_mv, weights=weights, data=centered_X))
-
-            # Compute top eigenvector of covariance operator
-            eigvals, eigvecs = eigsh(lin_op, k=1, which="LA")
-            v = eigvecs[:, 0]
-        
-        else:
-            v = np.array([1.0])
-
-        # Check stopping condition
-        if eigvals[0] * v @ v <= threshold:
+        if np.array_equal(weights, prev_weights):
+            # Converged
             return mu
-
-        prev_weights = weights
 
     # If not converged, return last estimate
     return mu
@@ -155,7 +152,7 @@ def meta_robust_mean(X: np.ndarray, sigma_min: float = 1, theta: float = 1.1, c:
     
     # Find sigma_max
     if d > 1:
-        lin_op = LinearOperator((d, d),matvec=partial(_linear_operator_mv, weights=np.ones(n)/n, data=X - np.mean(X, axis=0)))
+        lin_op = LinearOperator((d, d),matvec=partial(_linear_operator_mv, weights=np.ones(n)/n, X=X, center = np.mean(X, axis=0)))
         # Compute top eigenvalue of covariance operator
         eigvals, _ = eigsh(lin_op, k=1, which="LA")
         sigma_max = np.sqrt(eigvals[0])
@@ -189,6 +186,5 @@ def meta_robust_mean(X: np.ndarray, sigma_min: float = 1, theta: float = 1.1, c:
 
     if sigma_hat is None:
         raise RuntimeError("No valid beta_hat found — check robust_mean outputs.")
-
-
+    
     return estimates[sigma_hat]

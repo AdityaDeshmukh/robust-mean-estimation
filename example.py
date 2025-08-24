@@ -3,10 +3,10 @@ from robust_mean_estimation import robust_mean
 
 # Generate toy data: Gaussian cloud + outliers
 mu, sigma = 0, 1
-n, d = 500, 10
+n, d = 50000, 1000
 rng = np.random.default_rng(0)
-X = rng.normal(mu, sigma, size=(n, d))             # inliers
-outliers = rng.normal(10, 1, size=(int(0.2*n), d)) # outliers
+X = rng.normal(mu, sigma, size=(n, d))            # inliers
+outliers = rng.normal(1, 1, size=(int(0.5*n), d)) # outliers
 X = np.vstack([X, outliers])
 
 # Standard (naive) mean — sensitive to outliers
@@ -15,7 +15,7 @@ naive_mean = X.mean(axis=0)
 # Coordinate-wise median — more robust but not optimal in high-dimensions
 median = np.median(X, axis=0)
 
-# Robust mean estimate
+# Robust mean estimates
 robust_mu = robust_mean(X, sigma)
 
 print("Distance of naive mean from true mean:", round(np.linalg.norm(naive_mean - mu),5))
