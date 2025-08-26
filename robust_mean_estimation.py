@@ -30,7 +30,7 @@ def _linear_operator_mv(v: np.ndarray, weights: np.ndarray, X: np.ndarray, cente
     centered_proj = weights * (X @ v - center @ v)
     return centered_proj @ X - center * np.sum(centered_proj)
 
-def robust_mean(X: np.ndarray, sigma: float, c: float = 2.0, max_iter: int = 100) -> np.ndarray:
+def robust_mean(X: np.ndarray, sigma: float, c: float = 2.0, v: np.ndarray | None  = None, tol: float = 1e-3, max_iter: int = 100) -> np.ndarray:
     """
     Estimate the robust mean of a dataset using an iterative filtering procedure.
 
@@ -54,7 +54,11 @@ def robust_mean(X: np.ndarray, sigma: float, c: float = 2.0, max_iter: int = 100
         Spectral bound parameter that controls the trimming threshold.
     c : float
         Constant multiplier for the variance threshold (default: 2).
-    max_iter : int, optiona
+    v : np.ndarray | None
+        Optional initial direction vector of shape (d,). If None, a random vector is used.
+    tol : float
+        Convergence tolerance (default: 1e-3).
+    max_iter : int
         Maximum number of iterations (default: 100).
 
     Returns
@@ -69,8 +73,9 @@ def robust_mean(X: np.ndarray, sigma: float, c: float = 2.0, max_iter: int = 100
     n, d = X.shape
 
     # Initializations
-    v = np.random.normal(0,1,d)
-    v /= np.linalg.norm(v)
+    if v is None:
+        v = np.random.normal(0,1,d)
+        v /= np.linalg.norm(v)
     weights = np.ones(n)/n
     threshold = c * sigma**2
 
@@ -84,7 +89,7 @@ def robust_mean(X: np.ndarray, sigma: float, c: float = 2.0, max_iter: int = 100
         if d > 1:
             # Compute top eigenvector of covariance operator
             lin_op = LinearOperator((d, d),matvec=partial(_linear_operator_mv, weights=weights, X=X, center = mu))
-            _, eigvecs = eigsh(lin_op, k=1, which="LA", v0=v, ncv=15, tol=1e-3)
+            _, eigvecs = eigsh(lin_op, k=1, which="LA", v0=v, ncv=15, tol=tol)
             v = eigvecs[:, 0]
         else:
             v = np.array([1.0])
@@ -154,7 +159,8 @@ def meta_robust_mean(X: np.ndarray, sigma_min: float = 1, theta: float = 1.1, c:
     if d > 1:
         lin_op = LinearOperator((d, d),matvec=partial(_linear_operator_mv, weights=np.ones(n)/n, X=X, center = np.mean(X, axis=0)))
         # Compute top eigenvalue of covariance operator
-        eigvals, _ = eigsh(lin_op, k=1, which="LA")
+        eigvals, eigvecs = eigsh(lin_op, k=1, which="LA", ncv=15, tol=1e-3)
+        v = eigvecs[:, 0]
         sigma_max = np.sqrt(eigvals[0])
     else:
         sigma_max = np.std(X, axis=0)[0]
@@ -169,7 +175,7 @@ def meta_robust_mean(X: np.ndarray, sigma_min: float = 1, theta: float = 1.1, c:
     sigmas = sorted(sigmas)
 
     # Run robust_mean for each sigma
-    estimates = {sigma: robust_mean(X, sigma) for sigma in sigmas}
+    estimates = {sigma: robust_mean(X, sigma, v=v) for sigma in sigmas}
 
     # Find smallest sigma_hat satisfying Lemma 3 condition
     sigma_hat = None
